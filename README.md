@@ -1,6 +1,47 @@
 # Catalyst
 
-**TODO: Add description**
+## Usage
+
+In your OTP app add Catalyst as a worker
+
+```elixir
+  def start(_type, _args) do
+    import Supervisor.Spec
+
+    webdav_conf = [host: "http://example-webdav.com", user: "some_user", password: "123"]
+    # or you can supply just [host: "some_host", digest: "sadsadasd="]
+    # explicitly supplied digest will override digest hashed from user:password
+    children = [
+      worker(Catalyst, [webdav_conf])
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)
+  end
+```
+
+Authentication params will be stored inside genserver process, and you a good to go.
+
+Supported methods
+
+```elixir
+# GET file from uri
+Catalyst.get(uri)
+
+# http HEAD request to uri
+Catalyst.get(uri)
+
+# Create or update file with data
+Catalyst.put(uri, data)
+
+# Upload file to uri
+Catalyst.put_file(uri, filepath)
+
+# Upload whole directory recursively to uri
+Catalyst.put_directory(uri, dirpath)
+
+# Delete file from uri
+Catalyst.delete(uri)
+```
 
 ## Installation
 
