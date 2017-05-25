@@ -1,5 +1,7 @@
 # Catalyst
 
+Very basic WebDav client for Elixir. Uses native erlang :httpc library, does not require any additional dependencies
+
 ## Usage
 
 In your OTP app add Catalyst as a worker
@@ -11,6 +13,7 @@ In your OTP app add Catalyst as a worker
     webdav_conf = [host: "http://example-webdav.com", user: "some_user", password: "123"]
     # or you can supply just [host: "some_host", digest: "sadsadasd="]
     # explicitly supplied digest will override digest hashed from user:password
+    # currently supports only Basic HTTP authentication
     children = [
       worker(Catalyst, [webdav_conf])
     ]
@@ -28,7 +31,7 @@ Supported methods
 Catalyst.get(uri)
 
 # http HEAD request to uri
-Catalyst.get(uri)
+Catalyst.head(uri)
 
 # Create or update file with data
 Catalyst.put(uri, data)
