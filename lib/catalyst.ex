@@ -45,7 +45,6 @@ defmodule Catalyst do
   end
 
   def start_link(credentials) do
-    :inets.start()
     GenServer.start_link(__MODULE__, credentials, name: __MODULE__)
   end
 
@@ -56,7 +55,6 @@ defmodule Catalyst do
   end
 
   def get(host, uri, digest) do
-    IO.puts "inside lower GET"
     Http.http_request :get , full_url(host, uri), [auth_header(digest)]
   end
 
@@ -128,7 +126,6 @@ defmodule Catalyst do
   end
 
   def handle_call({:get, uri}, _from, config) do
-    IO.puts "i am inside handle call"
     status = get config.host, uri, config.digest
     {:reply, status, config}
   end
