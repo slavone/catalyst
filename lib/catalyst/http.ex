@@ -7,8 +7,8 @@ defmodule Catalyst.Http do
   Makes an http requst, allows to pass headers
 
   ## Examples
-    iex> Catalyst.Http.http_request :get, 'http://example.com'
-    {{'HTTP/1.1', 200, 'Ok'}, 'body'}
+      iex> Catalyst.Http.http_request :get, 'http://example.com'
+      {{'HTTP/1.1', 200, 'Ok'}, 'body'}
   """
   def http_request(method, url, headers \\ []) do
     handle_response :httpc.request(method, request_load(url, headers), [], [])
@@ -17,8 +17,8 @@ defmodule Catalyst.Http do
   Makes an http requst, allows to pass headers, content_type and body
 
   ## Examples
-    iex> Catalyst.Http.http_request :put, 'http://webdav.com/some_file.txt', [{'Authorization', 'Basic asdJasd='}], 'multipart/form-data.txt', ""
-    {{'HTTP/1.1', 201, 'Created'}, []}
+      iex> Catalyst.Http.http_request :put, 'http://webdav.com/some_file.txt', [{'Authorization', 'Basic asdJasd='}], 'multipart/form-data.txt', ""
+      {{'HTTP/1.1', 201, 'Created'}, []}
   """
   def http_request(method, url, headers, content_type, body) do
     request_load = request_load(url, headers, content_type, body)

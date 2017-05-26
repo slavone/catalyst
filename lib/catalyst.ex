@@ -20,8 +20,8 @@ defmodule Catalyst do
   Makes a GET request to a resource at specified URI
 
   ## Examples
-    iex> Catalyst.get "/some_resource.txt"
-    {{'HTTP/1.1', 200, 'Ok'}, 'content'}
+      iex> Catalyst.get "/some_resource.txt"
+      {{'HTTP/1.1', 200, 'Ok'}, 'content'}
   """
   def get(uri) do
     GenServer.call __MODULE__, {:get, uri}
@@ -31,8 +31,8 @@ defmodule Catalyst do
   PUT data into a resource at specified URI
 
   ## Examples
-    iex> Catalyst.put "/some_resource.txt", "content"
-    {{'HTTP/1.1', 201, 'Created'}, []}
+      iex> Catalyst.put "/some_resource.txt", "content"
+      {{'HTTP/1.1', 201, 'Created'}, []}
   """
   def put(uri, data) do
     GenServer.call __MODULE__, {:put, uri, data}
@@ -42,8 +42,8 @@ defmodule Catalyst do
   DELETE resource at specified URI
 
   ## Examples
-    iex> Catalyst.delete "/some_resource.txt"
-    {{'HTTP/1.1', 204, 'No Content'}, []}
+      iex> Catalyst.delete "/some_resource.txt"
+      {{'HTTP/1.1', 204, 'No Content'}, []}
   """
   def delete(uri) do
     GenServer.call __MODULE__, {:delete, uri}
@@ -51,11 +51,14 @@ defmodule Catalyst do
 
   @doc """
   Creates directory at specified URI
-  DISCLAIMER: erlang :httpc does not support MKCOL method, so this is implemented via PUTting tmp_file into the new directory and then deleting the file, leaving an empty new dir
+
+  DISCLAIMER: erlang :httpc does not support MKCOL method, so this is implemented
+  via PUTting tmp_file into the new directory and then deleting the file,
+  leaving an empty new dir
 
   ## Examples
-    iex> Catalyst.mkcol "/new_dir/"
-    {{'HTTP/1.1', 204, 'No Content'}, []}
+      iex> Catalyst.mkcol "/new_dir/"
+      {{'HTTP/1.1', 204, 'No Content'}, []}
   """
   def mkcol(uri) do
     GenServer.call __MODULE__, {:mkcol, uri}
@@ -65,8 +68,8 @@ defmodule Catalyst do
   HEAD request at specified URI
 
   ## Examples
-    iex> Catalyst.head "/new_dir/"
-    {{'HTTP/1.1', 200, 'OK'}, []}
+      iex> Catalyst.head "/new_dir/"
+      {{'HTTP/1.1', 200, 'OK'}, []}
   """
   def head(uri) do
     GenServer.call __MODULE__, {:head, uri}
@@ -76,8 +79,8 @@ defmodule Catalyst do
   Upload file contents at specified URI
 
   ## Examples
-    iex> Catalyst.put_file "/some_dir/new_file.txt", "files/some_file.txt"
-    {{'HTTP/1.1', 201, 'OK'}, []}
+      iex> Catalyst.put_file "/some_dir/new_file.txt", "files/some_file.txt"
+      {{'HTTP/1.1', 201, 'OK'}, []}
   """
   def put_file(uri, filepath) do
     GenServer.call __MODULE__, {:put_file, uri, filepath}
@@ -87,8 +90,8 @@ defmodule Catalyst do
   Recursively uploads whole directory to specified webdav dir
 
   ## Examples
-    iex> Catalyst.put_directory "/some_dir/", "files"
-    :ok
+      iex> Catalyst.put_directory "/some_dir/", "files"
+      :ok
   """
   def put_directory(uri, dir_path) do
     GenServer.call __MODULE__, {:put_directory, uri, dir_path}
@@ -98,8 +101,8 @@ defmodule Catalyst do
   Starts the webdav client genserver
 
   ## Examples
-    iex> Catalyst.start_link host: "http://webdav.server", user: "some_user", password: "password"
-    {:ok, #PID<0.175.0>}
+      iex> Catalyst.start_link host: "http://webdav.server", user: "some_user", password: "password"
+      {:ok, #PID<0.175.0>}
   """
   def start_link(credentials) do
     GenServer.start_link(__MODULE__, credentials, name: __MODULE__)
