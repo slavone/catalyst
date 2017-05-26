@@ -10,7 +10,8 @@ defmodule Catalyst.Mixfile do
       start_permanent: Mix.env == :prod,
       deps: deps(),
       description: "Elixir webdav client",
-      package: package()
+      package: package(),
+      source_url: "https://github.com/slavone/catalyst"
     ]
   end
 

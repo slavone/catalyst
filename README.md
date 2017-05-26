@@ -4,9 +4,13 @@ Very basic WebDav client for Elixir. Uses native erlang :httpc library, does not
 
 ## Usage
 
-In your OTP app add Catalyst as a worker
-
 ```elixir
+# Start a genserver process
+
+Catalyst.start_link host: "http://example-webdav.com", user: "some_user", password: "123"
+
+# or, in your OTP app add Catalyst as a worker
+
   def start(_type, _args) do
     import Supervisor.Spec
 
