@@ -28,27 +28,7 @@ Catalyst.start_link host: "http://example-webdav.com", user: "some_user", passwo
 
 Authentication params will be stored inside genserver process, and you a good to go.
 
-Supported methods
-
-```elixir
-# GET file from uri
-Catalyst.get(uri)
-
-# http HEAD request to uri
-Catalyst.head(uri)
-
-# Create or update file with data
-Catalyst.put(uri, data)
-
-# Upload file to uri
-Catalyst.put_file(uri, filepath)
-
-# Upload whole directory recursively to uri
-Catalyst.put_directory(uri, dirpath)
-
-# Delete file from uri
-Catalyst.delete(uri)
-```
+checkout the [DOCS](https://hexdocs.pm/catalyst/0.1.0/api-reference.html)
 
 ## Installation
 
