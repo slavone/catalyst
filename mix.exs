@@ -16,11 +16,20 @@ defmodule Catalyst.Mixfile do
   end
 
   def application do
-    [extra_applications: [:inets]]
+    [
+      applications: applications(Mix.env),
+      extra_applications: [:inets]
+    ]
   end
 
+  defp applications(:test), do: [:cowboy, :plug, :tzdata]
+  defp applications(_), do: []
+
   defp deps do
-    [{:ex_doc, "~> 0.14", only: :dev}]
+    [
+      {:ex_doc, "~> 0.14", only: :dev},
+      {:exdav, "~> 0.0.1", only: [:dev, :test], git: "git@github.com:slavone/exdav.git", branch: "feature/use-this-for-tests" }
+    ]
   end
 
   defp package do
