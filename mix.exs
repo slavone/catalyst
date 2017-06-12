@@ -18,7 +18,7 @@ defmodule Catalyst.Mixfile do
   def application do
     [
       applications: applications(Mix.env),
-      extra_applications: [:inets]
+      extra_applications: [:inets, :hackney]
     ]
   end
 
@@ -27,8 +27,9 @@ defmodule Catalyst.Mixfile do
 
   defp deps do
     [
+      {:hackney, "~> 1.8.4"},
       {:ex_doc, "~> 0.14", only: :dev},
-      {:exdav, "~> 0.0.1", only: [:dev, :test], git: "git@github.com:slavone/exdav.git", branch: "feature/use-this-for-tests" }
+      {:exdav, "~> 0.0.1", only: [:dev, :test], git: "git@github.com:slavone/exdav.git", ref: "9ad26817" }
     ]
   end
 
