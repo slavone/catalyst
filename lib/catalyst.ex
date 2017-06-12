@@ -24,7 +24,8 @@ defmodule Catalyst do
       {{'HTTP/1.1', 200, 'Ok'}, 'content'}
   """
   def get(uri) do
-    GenServer.call __MODULE__, {:get, uri}
+    config = get_state()
+    status = get config.host, uri, config.digest
   end
 
   @doc """
@@ -35,7 +36,8 @@ defmodule Catalyst do
       {{'HTTP/1.1', 201, 'Created'}, []}
   """
   def put(uri, data) do
-    GenServer.call __MODULE__, {:put, uri, data}
+    config = get_state()
+    put config.host, uri, data, config.digest
   end
 
   @doc """
@@ -46,7 +48,8 @@ defmodule Catalyst do
       {{'HTTP/1.1', 204, 'No Content'}, []}
   """
   def delete(uri) do
-    GenServer.call __MODULE__, {:delete, uri}
+    config = get_state()
+    delete config.host, uri, config.digest
   end
 
   @doc """
@@ -61,7 +64,8 @@ defmodule Catalyst do
       {{'HTTP/1.1', 204, 'No Content'}, []}
   """
   def mkcol(uri) do
-    GenServer.call __MODULE__, {:mkcol, uri}
+    config = get_state()
+    mkcol config.host, uri, config.digest
   end
 
   @doc """
@@ -72,7 +76,8 @@ defmodule Catalyst do
       {{'HTTP/1.1', 200, 'OK'}, []}
   """
   def head(uri) do
-    GenServer.call __MODULE__, {:head, uri}
+    config = get_state()
+    head config.host, uri, config.digest
   end
 
   @doc """
@@ -83,7 +88,8 @@ defmodule Catalyst do
       {{'HTTP/1.1', 201, 'OK'}, []}
   """
   def put_file(uri, filepath) do
-    GenServer.call __MODULE__, {:put_file, uri, filepath}
+    config = get_state()
+    put_file config.host, uri, filepath, config.digest
   end
 
   @doc """
@@ -94,7 +100,8 @@ defmodule Catalyst do
       :ok
   """
   def put_directory(uri, dir_path) do
-    GenServer.call __MODULE__, {:put_directory, uri, dir_path}
+    config = get_state()
+    put_directory config.host, uri, dir_path, config.digest
   end
 
   @doc """
@@ -105,7 +112,8 @@ defmodule Catalyst do
       {:ok, #PID<0.175.0>}
   """
   def start_link(credentials) do
-    GenServer.start_link(__MODULE__, credentials, name: __MODULE__)
+    state = init_state credentials
+    Agent.start_link fn -> state end, name: __MODULE__
   end
 
   # Lower level API
@@ -115,7 +123,9 @@ defmodule Catalyst do
   end
 
   def get(host, uri, digest) do
-    Http.http_request :get , full_url(host, uri), [auth_header(digest)]
+    {:ok, status, _headers, body} = :hackney.get(full_url(host, uri), [auth_header(digest)], "", with_body: true)
+    {:ok, status, body}
+    # Http.http_request :get , full_url(host, uri), [auth_header(digest)]
   end
 
   def put(host, uri, data, digest) do
@@ -167,64 +177,23 @@ defmodule Catalyst do
     result
   end
 
-  # GenServer callbacks
-
-  def init(config) do
-    conf = Enum.into config, %{}
-    state = if conf[:digest] do
-      %Credentials{host: conf.host, digest: conf.digest}
-    else
-      digest = auth_digest(conf.user, conf.password)
-      %Credentials{host: conf.host, digest: digest}
-    end
-    {:ok, state}
-  end
-
-  def handle_call({:head, uri}, _from, config) do
-    status = head config.host, uri, config.digest
-    {:reply, status, config}
-  end
-
-  def handle_call({:get, uri}, _from, config) do
-    status = get config.host, uri, config.digest
-    {:reply, status, config}
-  end
-
-  def handle_call({:put, uri, data}, _from, config) do
-    status = put config.host, uri, data, config.digest
-    {:reply, status, config}
-  end
-
-  def handle_call({:put_file, uri, filepath}, _from, config) do
-    status = put_file config.host, uri, filepath, config.digest
-    {:reply, status, config}
-  end
-
-  def handle_call({:put_directory, uri, dir_path}, _from, config) do
-    put_directory config.host, uri, dir_path, config.digest
-    {:reply, :ok, config}
-  end
-
-  def handle_call({:mkcol, uri}, _from, config) do
-    status = mkcol config.host, uri, config.digest
-    {:reply, status, config}
-  end
-
-  def handle_call({:move, source_uri, dest_uri}, _from, config) do
-    status = move config.host, source_uri, dest_uri, config.digest
-    {:reply, status, config}
-  end
-
-  def handle_call({:delete, uri}, _from, config) do
-    status = delete config.host, uri, config.digest
-    {:reply, status, config}
-  end
-
   def delete(host, uri, digest) do
     Http.http_request :delete, full_url(host, uri), [auth_header(digest)]
   end
 
   # Helper methods
+
+  defp init_state(config) do
+    conf = Enum.into config, %{}
+    if conf[:digest] do
+      %Credentials{host: conf.host, digest: conf.digest}
+    else
+      digest = auth_digest(conf.user, conf.password)
+      %Credentials{host: conf.host, digest: digest}
+    end
+  end
+
+  defp get_state, do: Agent.get __MODULE__, &(&1)
 
   defp auth_header(digest), do: {'Authorization', 'Basic ' ++ digest}
   defp full_url(host, uri), do: to_charlist(host <> uri)
