@@ -119,26 +119,38 @@ defmodule Catalyst do
   # Lower level API
 
   def head(host, uri, digest) do
-    Http.http_request :head, full_url(host, uri), [auth_header(digest)]
+    # Http.http_request :head, full_url(host, uri), [auth_header(digest)]
+    {:ok, status, _, body} = :hackney.head(full_url(host, uri), [auth_header(digest)], "", with_body: true)
+    {:ok, status, body}
   end
 
   def get(host, uri, digest) do
-    {:ok, status, _headers, body} = :hackney.get(full_url(host, uri), [auth_header(digest)], "", with_body: true)
+    {:ok, status, _, body} = :hackney.get(full_url(host, uri), [auth_header(digest)], "", with_body: true)
     {:ok, status, body}
-    # Http.http_request :get , full_url(host, uri), [auth_header(digest)]
   end
 
+  def put(host, uri, {:file, _} = data, digest) do
+    headers = [auth_header(digest)]
+    {:ok, pid} = :hackney.request(:put, full_url(host, uri), headers, :stream_multipart, [])
+    :hackney.send_multipart_body(pid, data)
+    {:ok, status, _, pid} = :hackney.start_response(pid)
+    {:ok, body} = :hackney.body(pid)
+    {:ok, status, body}
+  end
   def put(host, uri, data, digest) do
-    Http.http_request :put, full_url(host, uri), [auth_header(digest)],
-      'multipart/form-data', data
+    {:ok, pid} = :hackney.request(:put, full_url(host, uri), [auth_header(digest)], :stream, [])
+    :hackney.send_body(pid, data)
+    {:ok, status, _, pid} = :hackney.start_response(pid)
+    {:ok, body} = :hackney.body(pid)
+    {:ok, status, body}
   end
 
   def put_file(host, uri, filepath, digest) do
-    data = case File.read(filepath) do
-      {:ok, data} -> data
+    case File.stat(filepath) do
+      {:ok, %{type: :regular}} -> put host, uri, {:file, filepath}, digest
+      {:ok, %{type: :directory}} -> raise "#{filepath} is a directory, use :put_directory"
       {:error, _} -> raise "Could not open file at #{filepath}"
     end
-    put host, uri, data, digest
   end
 
   def put_directory(host, uri, dir_path, digest) do
@@ -168,17 +180,14 @@ defmodule Catalyst do
     delete(host, source_uri, digest)
   end
 
-  # erlang httpc library doesnt support MKCOL method
-  # so heres a workaround that gets the same effect
   def mkcol(host, uri, digest) do
-    tmp_uri = "#{uri}/tmp_file"
-    result = put host, tmp_uri, "", digest
-    delete(host, tmp_uri, digest)
-    result
+    {:ok, status, _, body} = :hackney.mkcol(full_url(host, uri), [auth_header(digest)], "", with_body: true)
+    {:ok, status, body}
   end
 
   def delete(host, uri, digest) do
-    Http.http_request :delete, full_url(host, uri), [auth_header(digest)]
+    {:ok, status, _, body} = :hackney.delete(full_url(host, uri), [auth_header(digest)], "", with_body: true)
+    {:ok, status, body}
   end
 
   # Helper methods

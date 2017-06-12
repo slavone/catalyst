@@ -49,19 +49,42 @@ defmodule CatalystTest do
   test "PUT data" do
     File.rm "test/file.txt"
     resp = Catalyst.put "/file.txt", "data"
-    assert resp == {{'HTTP/1.1', 201, 'Created'}, []}
+    assert resp == {:ok, 201, ""}
     assert File.read("test/file.txt") == {:ok, "data"}
     File.rm "test/file.txt"
   end
 
+  test "PUT file" do
+    File.rm "test/file.txt"
+    File.open("test/file.txt", [:write], fn(file) ->
+        IO.binwrite(file, "abcd")
+    end)
+    resp = Catalyst.put_file "/file.txt", "test/file.txt"
+    assert resp == {:ok, 201, ""}
+    # assert File.read("test/file.txt") == {:ok, "abcd"}
+    File.rm "test/file.txt"
+  end
+
+  test "MKCOL /dir" do
+    File.rmdir "test/dir"
+    resp_before = Catalyst.get "/dir"
+    assert resp_before == {:ok, 404, ""}
+    resp = Catalyst.mkcol "/dir/"
+    assert resp == {:ok, 200, ""}
+    resp_after = Catalyst.get "/dir"
+    assert resp_after == {:ok, 200, ""}
+    assert File.dir? "test/dir"
+    File.rmdir "test/dir"
+  end
+
   test "DELETE file" do
     resp = Catalyst.delete "/file.txt"
-    assert resp == {{'HTTP/1.1', 404, 'Not Found'}, []}
+    assert resp == {:ok, 404, ""}
     File.open("test/file.txt", [:write], fn(file) ->
         IO.binwrite(file, "abcd")
     end)
     resp = Catalyst.delete "/file.txt"
-    assert resp == {{'HTTP/1.1', 200, 'OK'}, []}
+    assert resp == {:ok, 200, ""}
     assert File.exists?("test/file.txt") == false
   end
 end
