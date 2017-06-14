@@ -18,7 +18,7 @@ defmodule Catalyst.Mixfile do
   def application do
     [
       applications: applications(Mix.env),
-      extra_applications: [:inets, :hackney]
+      extra_applications: [:hackney]
     ]
   end
 
