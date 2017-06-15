@@ -1,6 +1,6 @@
 # Catalyst
 
-Very basic WebDav client for Elixir. Uses native erlang :httpc library, does not require any additional dependencies
+Very basic WebDav client for Elixir. Uses :hackney as http driver
 
 ## Usage
 
@@ -28,7 +28,7 @@ Catalyst.start_link host: "http://example-webdav.com", user: "some_user", passwo
 
 Authentication params will be stored inside genserver process, and you a good to go.
 
-checkout the [DOCS](https://hexdocs.pm/catalyst/0.1.0/api-reference.html)
+checkout the [Docs](https://hexdocs.pm/catalyst/0.1.0/api-reference.html)
 
 ## Installation
 
@@ -37,7 +37,7 @@ by adding `catalyst` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:catalyst, "~> 0.1.0"}]
+  [{:catalyst, "~> 0.2.0"}]
 end
 ```
 
