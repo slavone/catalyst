@@ -21,7 +21,7 @@ defmodule Catalyst do
 
   ## Examples
       iex> Catalyst.get "/some_resource.txt"
-      {{'HTTP/1.1', 200, 'Ok'}, 'content'}
+      {:ok, 200, "content"}
   """
   def get(uri) do
     config = get_state()
@@ -33,7 +33,7 @@ defmodule Catalyst do
 
   ## Examples
       iex> Catalyst.put "/some_resource.txt", "content"
-      {{'HTTP/1.1', 201, 'Created'}, []}
+      {:ok, 201, "content"}
   """
   def put(uri, data) do
     config = get_state()
@@ -41,11 +41,23 @@ defmodule Catalyst do
   end
 
   @doc """
+  MOVE data from source uri to destination uri
+
+  ## Examples
+      iex> Catalyst.move "/some_dir/some_resource.txt", "/some_resource.txt"
+      {:ok, 204, ""}
+  """
+  def move(source_uri, destination_uri) do
+    config = get_state()
+    move config.host, source_uri, destination_uri, config.digest
+  end
+
+  @doc """
   DELETE resource at specified URI
 
   ## Examples
       iex> Catalyst.delete "/some_resource.txt"
-      {{'HTTP/1.1', 204, 'No Content'}, []}
+      {:ok, 204, ""}
   """
   def delete(uri) do
     config = get_state()
@@ -55,13 +67,9 @@ defmodule Catalyst do
   @doc """
   Creates directory at specified URI
 
-  DISCLAIMER: erlang :httpc does not support MKCOL method, so this is implemented
-  via PUTting tmp_file into the new directory and then deleting the file,
-  leaving an empty new dir
-
   ## Examples
       iex> Catalyst.mkcol "/new_dir/"
-      {{'HTTP/1.1', 204, 'No Content'}, []}
+      {:ok, 201, ""}
   """
   def mkcol(uri) do
     config = get_state()
@@ -73,7 +81,7 @@ defmodule Catalyst do
 
   ## Examples
       iex> Catalyst.head "/new_dir/"
-      {{'HTTP/1.1', 200, 'OK'}, []}
+      {:ok, 200, ""}
   """
   def head(uri) do
     config = get_state()
@@ -85,7 +93,7 @@ defmodule Catalyst do
 
   ## Examples
       iex> Catalyst.put_file "/some_dir/new_file.txt", "files/some_file.txt"
-      {{'HTTP/1.1', 201, 'OK'}, []}
+      {:ok, 201, ""}
   """
   def put_file(uri, filepath) do
     config = get_state()
@@ -172,12 +180,10 @@ defmodule Catalyst do
     end
   end
 
-  # erlang httpc library doesnt support MOVE method
-  # so heres a workaround that gets the same effect
   def move(host, source_uri, destination_uri, digest) do
-    {{_, 200, _}, body} = get(host, source_uri, digest)
-    put(host, destination_uri, body, digest)
-    delete(host, source_uri, digest)
+    dest_header = {"Destination", destination_uri}
+    {:ok, status, _, body} = :hackney.move(full_url(host, source_uri), [auth_header(digest), dest_header], "", with_body: true)
+    {:ok, status, body}
   end
 
   def mkcol(host, uri, digest) do
