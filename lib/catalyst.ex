@@ -90,8 +90,8 @@ defmodule Catalyst do
     iex> Catalyst.put_directory "/some_dir/", "files"
     :ok
   """
-  def put_directory(uri, dir_path) do
-    GenServer.call __MODULE__, {:put_directory, uri, dir_path}
+  def put_directory(uri, dir_path, timeout \\ 5_000) do
+    GenServer.call __MODULE__, {:put_directory, uri, dir_path}, timeout
   end
 
   @doc """
