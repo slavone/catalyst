@@ -11,7 +11,7 @@ defmodule Catalyst.Http do
     {{'HTTP/1.1', 200, 'Ok'}, 'body'}
   """
   def http_request(method, url, headers \\ []) do
-    handle_response :httpc.request(method, request_load(url, headers), [], [])
+    handle_response :httpc.request(method, request_load(url, headers), [], [{:body_format, :binary}])
   end
   @doc """
   Makes an http requst, allows to pass headers, content_type and body
@@ -23,7 +23,7 @@ defmodule Catalyst.Http do
   def http_request(method, url, headers, content_type, body) do
     request_load = request_load(url, headers, content_type, body)
 
-    handle_response :httpc.request(method, request_load, [], [])
+    handle_response :httpc.request(method, request_load, [], [{:body_format, :binary}])
   end
 
   defp request_load(url, headers \\ []) do
