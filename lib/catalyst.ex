@@ -77,6 +77,25 @@ defmodule Catalyst do
   end
 
   @doc """
+  Creates directories recursirve at specified URI
+
+  ## Examples 
+      iex> Catalyst.mkcol "/new_dir/level_2/level_3/"
+      {:ok, 201, ""}
+  """
+  def mkcol_p(uri) do
+    uri
+    |> String.split("/", trim: true)
+    |> Enum.reduce("/", fn dir, path ->
+      path = "#{path}#{dir}/"
+      {:ok, 201, _} = mkcol(path)
+      path
+    end)
+
+    {:ok, 201, ""}
+  end
+
+  @doc """
   HEAD request at specified URI
 
   ## Examples
