@@ -37,7 +37,7 @@ by adding `catalyst` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:catalyst, "~> 0.2.0"}]
+  [{:catalyst, "~> 0.2.1"}]
 end
 ```
 
