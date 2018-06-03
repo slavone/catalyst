@@ -1,5 +1,5 @@
 defmodule Catalyst do
-  use GenServer
+  use Application
 
   alias Catalyst.Http
 
@@ -131,16 +131,10 @@ defmodule Catalyst do
     put_directory config.host, uri, dir_path, config.digest
   end
 
-  @doc """
-  Starts the webdav client genserver
+  def start(_app, _args) do
+  end
 
-  ## Examples
-      iex> Catalyst.start_link host: "http://webdav.server", user: "some_user", password: "password"
-      {:ok, #PID<0.175.0>}
-  """
-  def start_link(credentials) do
-    state = init_state credentials
-    Agent.start_link fn -> state end, name: __MODULE__
+  def stop(_app) do
   end
 
   # Lower level API
@@ -217,8 +211,10 @@ defmodule Catalyst do
 
   # Helper methods
 
-  defp init_state(config) do
-    conf = Enum.into config, %{}
+  defp credentials() do
+    conf = :catalyst
+           |> Application.fetch_env!(:config)
+           |> Enum.into(%{})
     if conf[:digest] do
       %Credentials{host: conf.host, digest: conf.digest}
     else
@@ -227,7 +223,7 @@ defmodule Catalyst do
     end
   end
 
-  defp get_state, do: Agent.get __MODULE__, &(&1)
+  defp get_state, do: credentials()
 
   defp auth_header(digest), do: {'Authorization', 'Basic ' ++ digest}
   defp full_url(host, uri), do: to_charlist(host <> uri)
