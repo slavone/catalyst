@@ -7,7 +7,7 @@ defmodule CatalystTest do
       Plug.Adapters.Cowboy.child_spec(:http, Exdav, exdav_params, port: 1337)
     ]
 
-    Catalyst.start_link host: "http://localhost:1337", user: "abc", password: "123"
+    Application.put_env :catalyst, :config, [host: "http://localhost:1337", user: "abc", password: "123"]
     Supervisor.start_link(children, strategy: :one_for_one)
     :ok
   end

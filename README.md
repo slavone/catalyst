@@ -5,28 +5,22 @@ Very basic WebDav client for Elixir. Uses :hackney as http driver
 ## Usage
 
 ```elixir
-# Start a genserver process
+# Catalyst is an OTP app which keeps the webdav config inside an application environment
+# https://hexdocs.pm/elixir/Application.html#module-application-environment
 
-Catalyst.start_link host: "http://example-webdav.com", user: "some_user", password: "123"
+# inside your config.exs file
 
-# or, in your OTP app add Catalyst as a worker
+config :catalyst, :config, [
+  host: "http://example-webdav.com",
+  user: "some_user",
+  password: "123"
+]
 
-  def start(_type, _args) do
-    import Supervisor.Spec
-
-    webdav_conf = [host: "http://example-webdav.com", user: "some_user", password: "123"]
-    # or you can supply just [host: "some_host", digest: "sadsadasd="]
-    # explicitly supplied digest will override digest hashed from user:password
-    # currently supports only Basic HTTP authentication
-    children = [
-      worker(Catalyst, [webdav_conf])
-    ]
-
-    Supervisor.start_link(children, strategy: :one_for_one)
-  end
 ```
 
-Authentication params will be stored inside genserver process, and you a good to go.
+And make sure that the Catalyst application gets loaded inside your app
+
+Authentication params will be stored inside the application environment, and you a good to go.
 
 checkout the [Docs](https://hexdocs.pm/catalyst/0.1.0/api-reference.html)
 
