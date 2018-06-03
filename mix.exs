@@ -4,7 +4,7 @@ defmodule Catalyst.Mixfile do
   def project do
     [
       app: :catalyst,
-      version: "0.2.1",
+      version: "0.3.0",
       elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -18,7 +18,8 @@ defmodule Catalyst.Mixfile do
   def application do
     [
       applications: applications(Mix.env),
-      extra_applications: [:hackney]
+      extra_applications: [:hackney],
+      env: [config: []]
     ]
   end
 
@@ -27,7 +28,7 @@ defmodule Catalyst.Mixfile do
 
   defp deps do
     [
-      {:hackney, "~> 1.8.4"},
+      {:hackney, "~> 1.12.1"},
       {:ex_doc, "~> 0.14", only: :dev},
       {:exdav, "~> 0.0.1", only: [:dev, :test], git: "git@github.com:slavone/exdav.git", ref: "9ad26817" }
     ]
